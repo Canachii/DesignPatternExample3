@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Farmer : MonoBehaviour
 {
     public float speed = 3f;
     public KeyCode interact = KeyCode.E;
-    public int maxCrop = 5;
 
-    private List<Crop> _crops = new List<Crop>();
     private Animator _animator;
     private FarmerCollider _collider;
+    private Rigidbody2D _rigidbody;
+
     private float _x;
     private float _y;
 
@@ -18,33 +16,44 @@ public class Farmer : MonoBehaviour
     {
         _animator = GetComponent<Animator>();
         _collider = GetComponentInChildren<FarmerCollider>();
+        _rigidbody = GetComponent<Rigidbody2D>();
     }
 
     private void Update()
+    {
+        Move();
+        Interact();
+    }
+
+    private void FixedUpdate()
+    {
+        _rigidbody.velocity = new Vector2(_x, _y).normalized * speed;
+    }
+
+    private void Move()
     {
         _x = Input.GetAxisRaw("Horizontal");
         _y = Input.GetAxisRaw("Vertical");
 
         _animator.SetFloat("Horizontal", _x);
         _animator.SetFloat("Vertical", _y);
-
-        if (_x == 0 && _y == 0)
-        {
-            _animator.speed = 0;
-        }
-        else
-        {
-            _animator.speed = 0;
-        }
-
-        if (Input.GetKeyDown(interact) && _collider.IsTouch)
-        {
-            Debug.Log("Touch " + _collider.Thing);
-        }
+        _animator.speed = _rigidbody.velocity == Vector2.zero ? 0 : 1;
     }
 
-    private void FixedUpdate()
+    private void Interact()
     {
-        transform.Translate(new Vector3(_x, _y, 0) * speed);
+        if (Input.GetKeyDown(interact))
+        {
+            if (_collider.IsTouch && _collider.IsExist)
+            {
+                Debug.Log("Touch " + _collider.Thing);
+                // Sell();
+            }
+            else if (_collider.IsTouch)
+            {
+                GameManager.instance.Gold += 100;
+                // Plant();
+            }
+        }
     }
 }

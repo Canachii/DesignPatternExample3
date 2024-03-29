@@ -1,10 +1,9 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class FarmerCollider : MonoBehaviour
 {
     public bool IsTouch { get; private set; }
-    public bool IsExist { get; set; }
+    public bool IsExist { get; private set; }
     public string Thing { get; private set; }
 
     private void OnTriggerEnter2D(Collider2D other)
